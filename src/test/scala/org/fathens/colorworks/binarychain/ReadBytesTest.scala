@@ -1,15 +1,15 @@
 package org.fathens.colorworks.binarychain
 
 import java.io._
-import _root_.org.specs._
+import _root_.org.specs2.mutable._
 
 object ByteArray {
-  implicit def range(seq: RandomAccessSeq.Projection[Int]): List[Byte] = range(seq:_*)
+  implicit def range(seq: Range): List[Byte] = range(seq:_*)
   def range(seq: Int*) = ( seq map { _.toByte } ).toList
   def newInputStream(array: List[Byte]) = new ByteArrayInputStream(array.toArray)
   def newInputStream(string: String): InputStream = newInputStream(string.getBytes.toList)
 }
-class ReadBytesTest extends SpecificationWithJUnit {
+class ReadBytesTest extends Specification {
   import ByteArray._
   "デフォルトの読み込みサイズは1" in {
     val bytes = ReadBytes(newInputStream("ABC"))
@@ -26,7 +26,7 @@ class ReadBytesTest extends SpecificationWithJUnit {
     new String(bytes.bytes.toArray) must_== "BCD"
   }
 }
-class BuilderTest extends SpecificationWithJUnit {
+class BuilderTest extends Specification {
   import ByteArray._
   "読み込み過ぎてもエラーにならない" in {
     object Reader extends Builder[Bytes] {
@@ -52,7 +52,7 @@ class BuilderTest extends SpecificationWithJUnit {
     bytes.length must_== 0
   }
 }
-class ExpressionTest extends SpecificationWithJUnit {
+class ExpressionTest extends Specification {
   import ByteArray._
   class ThreePart(a: Bytes, b: Bytes, c: Bytes) extends Expression {
     val bytes = consists(a, b, c)
@@ -76,7 +76,7 @@ class ExpressionTest extends SpecificationWithJUnit {
     new String(buf) must_== "123456"
   }
 }
-class ExpressionListTest extends SpecificationWithJUnit {
+class ExpressionListTest extends Specification {
   import ByteArray._
   "リストは順番に連結される" in {
     val ins = newInputStream("123456789")

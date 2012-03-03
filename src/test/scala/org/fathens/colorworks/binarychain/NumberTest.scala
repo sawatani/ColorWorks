@@ -1,10 +1,10 @@
 package org.fathens.colorworks.binarychain
 
 import java.io._
-import _root_.org.specs2._
+import _root_.org.specs2.mutable._
 
-class NumberTest extends SpecificationWithJUnit("BasicalNumberの読み込み") {
-  implicit def range(seq: RandomAccessSeq.Projection[Int]): List[Byte] = range(seq:_*)
+class NumberTest extends Specification {
+  implicit def range(seq: Range): List[Byte] = range(seq:_*)
   implicit def toByte(i: Int) = (i.toByte) & 0xff
   def range(seq: Int*) = ( seq map { _.toByte } ).toList
   def newInputStream(seq: Int*): InputStream = newInputStream(range(seq:_*))
@@ -14,7 +14,7 @@ class NumberTest extends SpecificationWithJUnit("BasicalNumberの読み込み") 
   
   "Unsigned int 8-bit" should {
     "長さは1バイト" >> {
-      "参照数" >> { NumberU8.length must_== 1 }
+      "参照数" in { NumberU8.length must_== 1 }
       "実際の読み込み" >> {
         val ins = newInputStream(0, 1)
         NumberU8(ins).length must_== 1
