@@ -13,16 +13,17 @@ object ColorSpace {
   def apply(cs: java.awt.color.ICC_ColorSpace): ColorSpace = {
     new ColorSpace(cs)
   }
-  def apply(color: java.awt.Color): ColorSpace = {
-    this apply color.getColorSpace.asInstanceOf[java.awt.color.ICC_ColorSpace]
+  def apply(color: java.awt.Color): Option[ColorSpace] = color.getColorSpace match {
+    case cs: java.awt.color.ICC_ColorSpace => Some(this apply cs)
+    case _ => None
   }
   /**
    * プロファイル名と色の値を説明するための文字列にする
    */
   def makeDescription(color: java.awt.Color): String = {
-    val profileName = color.getColorSpace match {
-      case cs: java.awt.color.ICC_ColorSpace => ColorSpace(color).profileName
-      case _ => "NotICC"
+    val profileName = ColorSpace(color) match {
+      case Some(cs) => cs.profileName
+      case None => "NotICC"
     }
     val c = color.getColorComponents(null).map(_.toDouble).toList
     presentingMinMax(color.getColorSpace).output(c, 1).zipWithIndex.map {
@@ -118,8 +119,7 @@ class ColorSpace(val CS: java.awt.color.ICC_ColorSpace) {
    */
   def convert(render: RenderingIntent.Value)(srcColor: java.awt.Color): java.awt.Color = convert(render, render)(srcColor)
   def convert(srcRender: RenderingIntent.Value, dstRender: RenderingIntent.Value)(srcColor: java.awt.Color): java.awt.Color = {
-    val srcCS = ColorSpace(srcColor)
-    val transform = {
+    def transform(srcCS: ColorSpace) = {
       import sun.awt.color.ICC_Transform
       def tr(io: Int)(render: RenderingIntent.Value, cs: ColorSpace) = {
         try {
@@ -132,11 +132,14 @@ class ColorSpace(val CS: java.awt.color.ICC_ColorSpace) {
       val t1 = tr(ICC_Transform.Out)(dstRender, this)
       new ICC_Transform(Array(t0, t1))
     }
-    val dst = {
-      val src = srcCS.toShort(srcColor).toArray
-      transform.colorConvert(src, null).toList
+    ColorSpace(srcColor) match {
+      case Some(srcCS) => {
+        val src = srcCS.toShort(srcColor).toArray
+        val dst = transform(srcCS).colorConvert(src, null).toList
+        fromShort(dst)
+      }
+      case None => throw new IllegalArgumentException("Source color space is not ICC ColorSpace: " + srcColor.getColorSpace)
     }
-    fromShort(dst)
   }
 }
 object RenderingIntent extends Enumeration {
