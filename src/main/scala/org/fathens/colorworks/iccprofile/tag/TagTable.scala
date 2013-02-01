@@ -15,7 +15,7 @@ class TagTable(val tagCount: NumberU32, val tags: ExpressionList[TagRecord]) ext
   val bytes = consists(tagCount, tags)
 
   val count = tagCount.value.toInt
-  val sortedTags = tags.list sort { _.offset < _.offset }
+  val sortedTags = tags.list sortBy (_.offset)
 }
 
 object TagRecord extends BuilderFixed[TagRecord] {

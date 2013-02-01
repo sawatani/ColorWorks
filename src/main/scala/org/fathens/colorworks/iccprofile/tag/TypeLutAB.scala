@@ -50,7 +50,7 @@ package lutAB {
       ("M", offsetToM.value),
       ("CLUT", offsetToCLUT.value),
       ("A", offsetToA.value)
-    ) sort { _._2 < _._2 }
+    ) sortBy (_._2)
   }
   /**
    * カーブを納めている領域を表す

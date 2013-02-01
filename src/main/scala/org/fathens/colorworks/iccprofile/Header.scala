@@ -5,6 +5,9 @@ import _root_.org.fathens.colorworks.binarychain._
 
 object Header extends BuilderFixed[Header] {
   val length = 128.toLong
+  override def read(ins: java.io.InputStream, len: Int) = {
+    Nil
+  }
   override def apply(ins: InputStream) = {
     def string4 = String7bit(ins, 4)
     new Header(

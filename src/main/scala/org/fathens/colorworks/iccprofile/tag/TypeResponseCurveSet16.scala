@@ -19,7 +19,7 @@ object TypeResponseCurveSet16 extends ElementBuilder[TypeResponseCurveSet16] {
         readCurves(curveBuilder(ins, padding.toInt) :: curves, xs)
       }
     }
-    val curves = readCurves(Nil, offsets.list sort { _.value < _.value })
+    val curves = readCurves(Nil, offsets.list sortBy (_.value))
     new TypeResponseCurveSet16(commons, numChannels, count, offsets, curves)
   }
   class CurveBuilder(numChannels: Int) extends Builder[Curve] {

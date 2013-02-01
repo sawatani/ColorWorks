@@ -19,7 +19,7 @@ object TypeMultiLocalizedUnicode extends ElementBuilder[TypeMultiLocalizedUnicod
         readString(mString :: strings, fs)
       }
     }
-    val strings = readString( Nil, fields.list sort { _.offset < _.offset } )
+    val strings = readString( Nil, fields.list sortBy (_.offset) )
     new TypeMultiLocalizedUnicode(commons, numNames, fields, strings)
   }
   object EachField extends Builder[EachField] {
